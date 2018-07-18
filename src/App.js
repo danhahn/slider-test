@@ -1,6 +1,10 @@
 import React from 'react';
 import Swiper from 'react-id-swiper';
 import styled from 'styled-components';
+import Slide from './slide'
+import './App.css';
+
+const data = [1,2,3,4,5,6,7,8,9,10,11,12];
 
 const StyledSwipe = styled.div`
   /* border: 1px solid black; */
@@ -8,6 +12,15 @@ const StyledSwipe = styled.div`
   box-sizing: border-box;
   display: flex;
   border: 1px solid black;
+  &.fade {
+    border-color: red;
+    .imageWrapper img {
+      opacity: 0;
+    }
+    p {
+      opacity: 0;
+    }
+  }
 `;
 
 const Inner = styled.div`
@@ -15,8 +28,17 @@ const Inner = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  font-weight: bold;
-  padding-right: 25px;
+  .imageWrapper {
+    background-color: gray;
+  }
+  img {
+    transition: all 1s;
+    max-width: 100%;
+  }
+  p {
+    transition: all 1s;
+    margin: 1em;
+  }
 `;
 
 const CustomButtonPrev = styled.button`
@@ -38,67 +60,151 @@ const CustomButtonNext = CustomButtonPrev.extend`
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%0Axmlns:xlink='http://www.w3.org/1999/xlink' viewBox='0 0 23 70'%0Awidth='12px' height='35px'%3E%3Cpath fill-rule='evenodd' fill='#707070'%0Ad='M0.001,-0.003 L20.621,35.000 L0.001,70.002 L2.378,70.002 L22.999,35.000 L2.378,-0.003 L0.001,-0.003 Z'/%3E%3C/svg%3E ");
 `;
 
+// const Icon = styled.span``;
+
+const test = (e) => {
+  if(!!e.toElement.classList.value) {
+    if (e.toElement.classList.contains('imageWrapper')) {
+      return false;
+    }
+    return true;
+  };
+  return false;
+};
+
 class Example extends React.Component {
   render() {
     const params = {
       slidesPerView: 4,
       slidesPerGroup: 4,
+      initialSlide: 4,
+      preventInteractionOnTransition: true,
+      speed: 1000,
+      allowSlideNext: false,
+      allowSlidePrev: false,
 
-      renderPrevButton: () => <CustomButtonPrev className="swiper-button-prev" />,
-      renderNextButton: () => <CustomButtonNext className="swiper-button-next" />,
+      on: {
+        click(e) {
+          const doAnimateToNext = test(e);
+          if (doAnimateToNext) {
+            const isNext = e.toElement.classList.contains("swiper-button-next");
+            const { realIndex, passedParams: { slidesPerGroup }, slides } = this;
+            const slidesDOM = Array.from(Object.values(slides));
+            slidesDOM.forEach(item => {
+              if (item.classList) {
+                item.classList.add("fade");
+              }
+            });
+            setTimeout(() => {
+              if (isNext) {
+                this.allowSlideNext = true;
+                this.slideNext(0);
+                this.allowSlideNext = false;
+                const nextStart = realIndex + slidesPerGroup;
+                slidesDOM
+                  .slice(nextStart, nextStart + slidesPerGroup)
+                  .reverse()
+                  .forEach((item, index) => {
+                    setTimeout(() => {
+                      item.classList.remove("fade");
+                    }, (1000 / slidesPerGroup) * index);
+                  });
+              } else {
+                this.allowSlidePrev = true;
+                this.slidePrev(0);
+                this.allowSlidePrev = false;
+                const nextStart = realIndex - slidesPerGroup;
+                slidesDOM
+                  .slice(nextStart, nextStart + slidesPerGroup)
+                  // .reverse()
+                  .forEach((item, index) => {
+                    setTimeout(() => {
+                      item.classList.remove("fade");
+                    }, (1000 / slidesPerGroup) * index);
+                  });
+              }
+            }, (1000 / 2) + 200 );
+          }
+        }
+      },
+
+      renderPrevButton: () => (
+        <CustomButtonPrev className="swiper-button-prev" />
+      ),
+      renderNextButton: () => (
+        <CustomButtonNext className="swiper-button-next" />
+      ),
+
+      pagination: {
+        el: ".swiper-pagination",
+        clickable: true
+      },
 
       navigation: {
-        nextEl: '.swiper-button-next',
-        prevEl: '.swiper-button-prev'
+        nextEl: ".swiper-button-next",
+        prevEl: ".swiper-button-prev"
       },
       spaceBetween: 10,
       breakpoints: {
-        // when window width is <= 320px
-        320: {
-          slidesPerView: 1,
-          slidesPerGroup: 1,
-          spaceBetween: 10
-        },
         // when window width is <= 480px
         480: {
           slidesPerView: 2,
           slidesPerGroup: 2,
-          spaceBetween: 0,
+          spaceBetween: 10,
           freeMode: true,
-        },
-        // when window width is <= 640px
-        640: {
-          slidesPerView: 3,
-          slidesPerGroup: 3,
-          spaceBetween: 30
         }
       }
-    }
+    };
 
-    return (
-      <div style={{padding: 20}}>
+    return <div style={{ padding: 20 }}>
         <h2>Before</h2>
-        <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Necessitatibus, ex eaque voluptatem, dolorum eveniet delectus ut velit animi laboriosam quod, officiis saepe omnis temporibus! Excepturi fuga eius voluptatibus consectetur vero.</p>
-        <p>Enim maiores magni, consequuntur illo dolorum nulla inventore ad? Accusamus molestias ab doloremque commodi sunt optio voluptate consequuntur laudantium, perspiciatis, et quo quaerat earum cum repudiandae repellat laboriosam necessitatibus voluptas!</p>
-        <p>Modi dolor repudiandae id voluptates quia saepe, animi corporis consectetur provident. Cupiditate totam fugit architecto facilis. Quasi velit dolorem quos veritatis animi quisquam laboriosam accusamus! Quia in quas natus consequuntur.</p>
-          <Swiper {...params}>
-            <StyledSwipe><Inner>Slide 1</Inner></StyledSwipe>
-            <StyledSwipe><Inner>Slide 2</Inner></StyledSwipe>
-            <StyledSwipe><Inner>Slide 3</Inner></StyledSwipe>
-            <StyledSwipe><Inner>Slide 4</Inner></StyledSwipe>
-            <StyledSwipe><Inner>Slide 5</Inner></StyledSwipe>
-            <StyledSwipe><Inner>Slide 1a</Inner></StyledSwipe>
-            <StyledSwipe><Inner>Slide 2b</Inner></StyledSwipe>
-            <StyledSwipe><Inner>Slide 3d</Inner></StyledSwipe>
-            <StyledSwipe><Inner>Slide 4e</Inner></StyledSwipe>
-            <StyledSwipe><Inner>Slide 5f</Inner></StyledSwipe>
-          </Swiper>
+        <p>
+          Lorem, ipsum dolor sit amet consectetur adipisicing elit.
+          Necessitatibus, ex eaque voluptatem, dolorum eveniet delectus ut
+          velit animi laboriosam quod, officiis saepe omnis temporibus!
+          Excepturi fuga eius voluptatibus consectetur vero.
+        </p>
+        <p>
+          Enim maiores magni, consequuntur illo dolorum nulla inventore ad?
+          Accusamus molestias ab doloremque commodi sunt optio voluptate
+          consequuntur laudantium, perspiciatis, et quo quaerat earum cum
+          repudiandae repellat laboriosam necessitatibus voluptas!
+        </p>
+        <p>
+          Modi dolor repudiandae id voluptates quia saepe, animi corporis
+          consectetur provident. Cupiditate totam fugit architecto facilis.
+          Quasi velit dolorem quos veritatis animi quisquam laboriosam
+          accusamus! Quia in quas natus consequuntur.
+        </p>
+        <Swiper {...params}>
+          {
+            data.map(item => (
+            <StyledSwipe key={item}>
+              <Inner><Slide i={item} /></Inner>
+            </StyledSwipe>
+            ))
+          }
+        </Swiper>
         <h3>after</h3>
-        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Et ipsa, architecto, itaque praesentium eius nihil alias sapiente, earum iusto iure explicabo neque nemo ex? Consequuntur officiis mollitia aliquid quisquam cumque.</p>
-        <p>Fugit eligendi eveniet quasi blanditiis minima! Facilis perferendis id corporis autem? Expedita porro mollitia autem molestiae placeat asperiores alias hic nesciunt non voluptates obcaecati aliquam voluptatibus cum accusamus, labore architecto?</p>
-        <p>Aut, quasi! Repellendus sed maxime alias nobis odit dolores reiciendis vero libero, iste facilis optio delectus consectetur impedit soluta modi adipisci ab autem sequi voluptates expedita exercitationem corporis harum pariatur.</p>
-      </div>
-    )
+        <p>
+          Lorem ipsum dolor sit amet consectetur adipisicing elit. Et ipsa,
+          architecto, itaque praesentium eius nihil alias sapiente, earum
+          iusto iure explicabo neque nemo ex? Consequuntur officiis mollitia
+          aliquid quisquam cumque.
+        </p>
+        <p>
+          Fugit eligendi eveniet quasi blanditiis minima! Facilis
+          perferendis id corporis autem? Expedita porro mollitia autem
+          molestiae placeat asperiores alias hic nesciunt non voluptates
+          obcaecati aliquam voluptatibus cum accusamus, labore architecto?
+        </p>
+        <p>
+          Aut, quasi! Repellendus sed maxime alias nobis odit dolores
+          reiciendis vero libero, iste facilis optio delectus consectetur
+          impedit soluta modi adipisci ab autem sequi voluptates expedita
+          exercitationem corporis harum pariatur.
+        </p>
+      </div>;
   }
 }
 
