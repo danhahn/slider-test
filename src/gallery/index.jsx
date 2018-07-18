@@ -1,14 +1,14 @@
 import React from 'react';
 import Swiper from 'react-id-swiper';
 import styled from 'styled-components';
-import Slide from '../slide'
+import Slide from '../slide';
+import './gallery.css';
 
 const StyledSwipe = styled.div`
   /* border: 1px solid black; */
   height: 300px;
   box-sizing: border-box;
   display: flex;
-  border: 1px solid black;
   &.fade {
     border-color: red;
     .imageWrapper img {
@@ -126,6 +126,10 @@ class Gallery extends React.Component {
           if (window.innerWidth < 480) {
             this.allowSlideNext = true;
             this.allowSlidePrev = true;
+            const el = document.querySelector(".swiper-container");
+            setTimeout(() => {
+              el.classList.add('margin-offset')
+            }, 100)
           }
         }
       },
@@ -147,7 +151,7 @@ class Gallery extends React.Component {
         480: {
           slidesPerView: 2,
           slidesPerGroup: 2,
-          spaceBetween: 10,
+          spaceBetween: 0,
           freeMode: true,
         }
       }
