@@ -44,10 +44,16 @@ const CustomButtonPrev = styled.button`
   width: 29px;
   height: 65px;
   left: 0;
-  background-color: rgba(255, 255, 255, 0.9);
+  background-color: rgba(255, 255, 255, 0.7);
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%0Axmlns:xlink='http://www.w3.org/1999/xlink' viewBox='0 0 23 70'%0Awidth='12px' height='35px'%3E%3Cpath fill-rule='evenodd' fill='#707070'%0Ad='M22.999,70.003 L2.379,35.000 L22.999,-0.002 L20.622,-0.002 L0.001,35.000 L20.622,70.003 L22.999,70.003 Z'/%3E%3C/svg%3E");
   @media screen and (max-width: 510px) {
     display: none;
+  }
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.9);
+  }
+  &:focus {
+    border: 1px solid blue;
   }
 `;
 
@@ -59,29 +65,56 @@ const CustomButtonNext = CustomButtonPrev.extend`
 
 // const Icon = styled.span``;
 
-const test = (e) => {
+const checkAnimateToNext = e => {
   if (!!e.toElement.classList.value) {
-    if (e.toElement.classList.contains('imageWrapper')) {
+    if (e.toElement.classList.contains("imageWrapper")) {
       return false;
     }
     return true;
-  };
+  }
   return false;
 };
 
 class Gallery extends React.Component {
+  componentDidMount() {
+    var mySwiper = document.querySelector('.swiper-container').swiper
+    const next = document.querySelector(".swiper-button-next");
+    const prev = document.querySelector(".swiper-button-prev");
+
+    // Now you can use all slider methods like
+    next.addEventListener("keyup", function(event) {
+      event.preventDefault();
+      // Number 13 is the "Enter" key on the keyboard
+      if (event.keyCode === 13) {
+        mySwiper.allowSlideNext = true;
+        mySwiper.slideNext();
+        mySwiper.allowSlideNext = false;
+      }
+    });
+    // Now you can use all slider methods like
+    prev.addEventListener("keyup", function(event) {
+      event.preventDefault();
+      // Number 13 is the "Enter" key on the keyboard
+      if (event.keyCode === 13) {
+        mySwiper.allowSlidePrev = true;
+        mySwiper.slidePrev();
+        mySwiper.allowSlidePrev = false;
+      }
+    });
+  }
+
   render() {
     const params = {
       slidesPerView: 4,
       slidesPerGroup: 4,
-      preventInteractionOnTransition: true,
+      // preventInteractionOnTransition: true,
       speed: 1000,
       allowSlideNext: false,
       allowSlidePrev: false,
 
       on: {
         click(e) {
-          const doAnimateToNext = test(e);
+          const doAnimateToNext = checkAnimateToNext(e);
           if (doAnimateToNext) {
             const isNext = e.toElement.classList.contains("swiper-button-next");
             const { realIndex, passedParams: { slidesPerGroup }, slides } = this;
@@ -119,6 +152,13 @@ class Gallery extends React.Component {
                     }, (1000 / slidesPerGroup) * index);
                   });
               }
+              setTimeout(() => {
+                slidesDOM.forEach(item => {
+                  if (item.classList && item.classList.contains('fade')) {
+                    item.classList.remove('fade');
+                  }
+                })
+              }, 1000);
             }, (1000 / 2) + 200);
           }
         },
@@ -135,7 +175,7 @@ class Gallery extends React.Component {
       },
 
       renderPrevButton: () => (
-        <CustomButtonPrev className="swiper-button-prev" />
+        <CustomButtonPrev className="swiper-button-prev" ref={el => this.prev = el} />
       ),
       renderNextButton: () => (
         <CustomButtonNext className="swiper-button-next" />
