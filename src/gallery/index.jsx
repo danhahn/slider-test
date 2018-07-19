@@ -65,9 +65,26 @@ const CustomButtonNext = CustomButtonPrev.extend`
 
 // const Icon = styled.span``;
 
-const checkAnimateToNext = e => {
-  if (!!e.toElement.classList.value) {
-    if (e.toElement.classList.contains("imageWrapper")) {
+const disabledRealIdCheck = () => {
+
+}
+
+const checkAnimateToNext = (event, swiper) => {
+  const next = 'swiper-button-next';
+  const prev = 'swiper-button-prev';
+  const disabled = "swiper-button-disabled";
+  const cl = event.toElement ? event.toElement.classList : event.target.classList;
+  if (!!cl.value) {
+    // check if `imageWrapper` if yes return 'false'
+    if (cl.contains("imageWrapper")) {
+      return false;
+    }
+    // check to see if `next` or `prev` class are in the classList if not return 'false'
+    if (cl.length && (!cl.contains(next) && !cl.contains(prev))) {
+      return false;
+    }
+    // check if button is disabled
+    if (cl.contains(disabled) && (swiper.realIndex === 8 || swiper.realIndex ===0)) {
       return false;
     }
     return true;
@@ -75,30 +92,75 @@ const checkAnimateToNext = e => {
   return false;
 };
 
+const doAnimation = (swiper, event) => {
+  const doAnimateToNext = checkAnimateToNext(event, swiper);
+  if (doAnimateToNext) {
+    const cl = event.toElement ? event.toElement.classList : event.target.classList;
+    const isNext = cl.contains("swiper-button-next");
+    const { realIndex, passedParams: { slidesPerGroup }, slides } = swiper;
+    const slidesDOM = Array.from(Object.values(slides));
+    slidesDOM.forEach(item => {
+      if (item.classList) {
+        item.classList.add("fade");
+      }
+    });
+    setTimeout(() => {
+      if (isNext) {
+        swiper.allowSlideNext = true;
+        swiper.slideNext(0);
+        swiper.allowSlideNext = false;
+        const nextStart = realIndex + slidesPerGroup;
+        slidesDOM
+          .slice(nextStart, nextStart + slidesPerGroup)
+          .reverse()
+          .forEach((item, index) => {
+            setTimeout(() => {
+              item.classList.remove("fade");
+            }, (1000 / slidesPerGroup) * index);
+          });
+      } else {
+        swiper.allowSlidePrev = true;
+        swiper.slidePrev(0);
+        swiper.allowSlidePrev = false;
+        const nextStart = realIndex - slidesPerGroup;
+        slidesDOM
+          .slice(nextStart, nextStart + slidesPerGroup)
+          // .reverse()
+          .forEach((item, index) => {
+            setTimeout(() => {
+              item.classList.remove("fade");
+            }, (1000 / slidesPerGroup) * index);
+          });
+      }
+      setTimeout(() => {
+        slidesDOM.forEach(item => {
+          if (item.classList && item.classList.contains('fade')) {
+            item.classList.remove('fade');
+          }
+        })
+      }, 1000);
+    }, (1000 / 2) + 200);
+  }
+}
+
 class Gallery extends React.Component {
   componentDidMount() {
     var mySwiper = document.querySelector('.swiper-container').swiper
     const next = document.querySelector(".swiper-button-next");
     const prev = document.querySelector(".swiper-button-prev");
 
-    // Now you can use all slider methods like
-    next.addEventListener("keyup", function(event) {
+    next.addEventListener("keyup", (event) => {
       event.preventDefault();
       // Number 13 is the "Enter" key on the keyboard
       if (event.keyCode === 13) {
-        mySwiper.allowSlideNext = true;
-        mySwiper.slideNext();
-        mySwiper.allowSlideNext = false;
+        doAnimation(mySwiper, event);
       }
     });
-    // Now you can use all slider methods like
     prev.addEventListener("keyup", function(event) {
       event.preventDefault();
       // Number 13 is the "Enter" key on the keyboard
       if (event.keyCode === 13) {
-        mySwiper.allowSlidePrev = true;
-        mySwiper.slidePrev();
-        mySwiper.allowSlidePrev = false;
+        doAnimation(mySwiper, event);
       }
     });
   }
@@ -107,60 +169,13 @@ class Gallery extends React.Component {
     const params = {
       slidesPerView: 4,
       slidesPerGroup: 4,
-      // preventInteractionOnTransition: true,
       speed: 1000,
       allowSlideNext: false,
       allowSlidePrev: false,
 
       on: {
-        click(e) {
-          const doAnimateToNext = checkAnimateToNext(e);
-          if (doAnimateToNext) {
-            const isNext = e.toElement.classList.contains("swiper-button-next");
-            const { realIndex, passedParams: { slidesPerGroup }, slides } = this;
-            const slidesDOM = Array.from(Object.values(slides));
-            slidesDOM.forEach(item => {
-              if (item.classList) {
-                item.classList.add("fade");
-              }
-            });
-            setTimeout(() => {
-              if (isNext) {
-                this.allowSlideNext = true;
-                this.slideNext(0);
-                this.allowSlideNext = false;
-                const nextStart = realIndex + slidesPerGroup;
-                slidesDOM
-                  .slice(nextStart, nextStart + slidesPerGroup)
-                  .reverse()
-                  .forEach((item, index) => {
-                    setTimeout(() => {
-                      item.classList.remove("fade");
-                    }, (1000 / slidesPerGroup) * index);
-                  });
-              } else {
-                this.allowSlidePrev = true;
-                this.slidePrev(0);
-                this.allowSlidePrev = false;
-                const nextStart = realIndex - slidesPerGroup;
-                slidesDOM
-                  .slice(nextStart, nextStart + slidesPerGroup)
-                  // .reverse()
-                  .forEach((item, index) => {
-                    setTimeout(() => {
-                      item.classList.remove("fade");
-                    }, (1000 / slidesPerGroup) * index);
-                  });
-              }
-              setTimeout(() => {
-                slidesDOM.forEach(item => {
-                  if (item.classList && item.classList.contains('fade')) {
-                    item.classList.remove('fade');
-                  }
-                })
-              }, 1000);
-            }, (1000 / 2) + 200);
-          }
+        click(event) {
+          doAnimation(this, event);
         },
         init() {
           if (window.innerWidth < 480) {
