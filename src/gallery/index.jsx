@@ -46,6 +46,9 @@ const CustomButtonPrev = styled.button`
   left: 0;
   background-color: rgba(255, 255, 255, 0.7);
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%0Axmlns:xlink='http://www.w3.org/1999/xlink' viewBox='0 0 23 70'%0Awidth='12px' height='35px'%3E%3Cpath fill-rule='evenodd' fill='#707070'%0Ad='M22.999,70.003 L2.379,35.000 L22.999,-0.002 L20.622,-0.002 L0.001,35.000 L20.622,70.003 L22.999,70.003 Z'/%3E%3C/svg%3E");
+  &.swiper-button-disabled {
+    opacity: 0;
+  }
   @media screen and (max-width: 510px) {
     display: none;
   }
@@ -65,15 +68,29 @@ const CustomButtonNext = CustomButtonPrev.extend`
 
 // const Icon = styled.span``;
 
-const disabledRealIdCheck = () => {
+const disabledRealIdCheck = ({ realIndex, max, hasTwoSlides }) => {
+  // checks to see if has only two slides and returns `false` this is related
+  // to the way we have to check if the button is disabled
+  if (realIndex === 0 && hasTwoSlides) {
+    return false;
+  }
+  // return true if the realID is 0 but has more than two slides
+  if (realIndex === 0) {
+    return true;
+  }
 
-}
+  if (realIndex === max && !hasTwoSlides) {
+    return true;
+  }
+  return false;
+};
 
-const checkAnimateToNext = (event, swiper) => {
+const checkAnimateToNext = (event, isDisabled) => {
   const next = 'swiper-button-next';
   const prev = 'swiper-button-prev';
   const disabled = "swiper-button-disabled";
   const cl = event.toElement ? event.toElement.classList : event.target.classList;
+  console.log({ isDisabled})
   if (!!cl.value) {
     // check if `imageWrapper` if yes return 'false'
     if (cl.contains("imageWrapper")) {
@@ -84,7 +101,7 @@ const checkAnimateToNext = (event, swiper) => {
       return false;
     }
     // check if button is disabled
-    if (cl.contains(disabled) && (swiper.realIndex === 8 || swiper.realIndex ===0)) {
+    if (cl.contains(disabled) && isDisabled) {
       return false;
     }
     return true;
@@ -92,12 +109,30 @@ const checkAnimateToNext = (event, swiper) => {
   return false;
 };
 
+const doSlideUpdates = slidesDOM => {
+  // return slidesDOM
+  //   .slice(nextStart, nextStart + slidesPerGroup)
+  //   .reverse()
+  //   .forEach((item, index) => {
+  //     setTimeout(() => {
+  //       if (item.classList && item.classList.contains("fade")) {
+  //         item.classList.remove("fade");
+  //       }
+  //     }, (1000 / slidesPerGroup) * index);
+  //   });
+};
+
 const doAnimation = (swiper, event) => {
-  const doAnimateToNext = checkAnimateToNext(event, swiper);
+  const { realIndex, passedParams: { slidesPerGroup }, slides, slidesGrid } = swiper;
+  const isDisabled = disabledRealIdCheck({
+    realIndex,
+    max: slidesGrid.length - slidesPerGroup,
+    hasTwoSlides: slidesGrid.length / slidesPerGroup === 2
+  });
+  const doAnimateToNext = checkAnimateToNext(event, isDisabled);
   if (doAnimateToNext) {
     const cl = event.toElement ? event.toElement.classList : event.target.classList;
     const isNext = cl.contains("swiper-button-next");
-    const { realIndex, passedParams: { slidesPerGroup }, slides } = swiper;
     const slidesDOM = Array.from(Object.values(slides));
     slidesDOM.forEach(item => {
       if (item.classList) {
@@ -115,7 +150,9 @@ const doAnimation = (swiper, event) => {
           .reverse()
           .forEach((item, index) => {
             setTimeout(() => {
-              item.classList.remove("fade");
+              if (item.classList && item.classList.contains('fade')) {
+                item.classList.remove("fade");
+              }
             }, (1000 / slidesPerGroup) * index);
           });
       } else {
@@ -128,7 +165,9 @@ const doAnimation = (swiper, event) => {
           // .reverse()
           .forEach((item, index) => {
             setTimeout(() => {
-              item.classList.remove("fade");
+              if (item.classList && item.classList.contains('fade')) {
+                item.classList.remove("fade");
+              }
             }, (1000 / slidesPerGroup) * index);
           });
       }
@@ -190,7 +229,7 @@ class Gallery extends React.Component {
       },
 
       renderPrevButton: () => (
-        <CustomButtonPrev className="swiper-button-prev" ref={el => this.prev = el} />
+        <CustomButtonPrev className="swiper-button-prev" />
       ),
       renderNextButton: () => (
         <CustomButtonNext className="swiper-button-next" />
