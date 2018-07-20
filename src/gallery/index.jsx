@@ -1,42 +1,7 @@
 import React from 'react';
 import Swiper from 'react-id-swiper';
 import styled from 'styled-components';
-import Slide from '../slide';
 import './gallery.css';
-
-const StyledSwipe = styled.div`
-  /* border: 1px solid black; */
-  height: 300px;
-  box-sizing: border-box;
-  display: flex;
-  &.fade {
-    border-color: red;
-    .imageWrapper img {
-      opacity: 0;
-    }
-    p {
-      opacity: 0;
-    }
-  }
-`;
-
-const Inner = styled.div`
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  .imageWrapper {
-    background-color: gray;
-  }
-  img {
-    transition: all 1s;
-    max-width: 100%;
-  }
-  p {
-    transition: all 1s;
-    margin: 1em;
-  }
-`;
 
 const CustomButtonPrev = styled.button`
   outline: none;
@@ -191,33 +156,35 @@ const doAnimation = (swiper, event, props) => {
 
 class Gallery extends React.Component {
   componentDidMount() {
-    const {duration, className} = this.props;
-    const props = {
-      duration,
-      className
-    }
-    var mySwiper = document.querySelector('.swiper-container').swiper
-    const next = document.querySelector(".swiper-button-next");
-    const prev = document.querySelector(".swiper-button-prev");
+    setTimeout(() => {
+      const {duration, className} = this.props;
+      const props = {
+        duration,
+        className
+      }
+      var mySwiper = document.querySelector('.swiper-container').swiper
+      const next = document.querySelector(".swiper-button-next");
+      const prev = document.querySelector(".swiper-button-prev");
 
-    next.addEventListener("keyup", (event) => {
-      event.preventDefault();
-      // Number 13 is the "Enter" key on the keyboard
-      if (event.keyCode === 13) {
-        doAnimation(mySwiper, event, props);
-      }
-    });
-    prev.addEventListener("keyup", function(event) {
-      event.preventDefault();
-      // Number 13 is the "Enter" key on the keyboard
-      if (event.keyCode === 13) {
-        doAnimation(mySwiper, event, props);
-      }
-    });
+      next.addEventListener("keyup", (event) => {
+        event.preventDefault();
+        // Number 13 is the "Enter" key on the keyboard
+        if (event.keyCode === 13) {
+          doAnimation(mySwiper, event, props);
+        }
+      });
+      prev.addEventListener("keyup", function(event) {
+        event.preventDefault();
+        // Number 13 is the "Enter" key on the keyboard
+        if (event.keyCode === 13) {
+          doAnimation(mySwiper, event, props);
+        }
+      });
+    }, 1000)
   }
 
   render() {
-    const { duration, className } = this.props;
+    const { duration, className, nextButton, prevButton } = this.props;
 
     const props = {
       duration,
@@ -247,12 +214,20 @@ class Gallery extends React.Component {
         }
       },
 
-      renderPrevButton: () => (
-        <CustomButtonPrev className="swiper-button-prev" />
-      ),
-      renderNextButton: () => (
-        <CustomButtonNext className="swiper-button-next" />
-      ),
+      renderPrevButton: () => ({
+        ...prevButton,
+        props: {
+          ...prevButton.props,
+          className: 'swiper-button-prev'
+        }
+      }),
+      renderNextButton: () => ({
+        ...nextButton,
+        props: {
+          ...nextButton.props,
+          className: 'swiper-button-next'
+        }
+      }),
 
       navigation: {
         nextEl: ".swiper-button-next",
