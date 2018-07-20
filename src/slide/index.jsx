@@ -18,7 +18,7 @@ const Slide = ({i}) => {
       </div>
       <p>
         {i} Lorem ipsum dolor sit amet consectetur adipisicing elit. Totam
-        fuga adipisci tenetur ab facere quaerat nulla, nesciunt, cum ipsam
+        fuga adipisci tenetur abe facere quaerat nulla, nesciunt, cum ipsam
         quam maxime animi, aut voluptatem vitae rem impedit error. Itaque,
         architecto.
       </p>

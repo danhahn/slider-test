@@ -1,37 +1,6 @@
 import React from 'react';
 import Swiper from 'react-id-swiper';
-import styled from 'styled-components';
 import './gallery.css';
-
-const CustomButtonPrev = styled.button`
-  outline: none;
-  border: none;
-  width: 29px;
-  height: 65px;
-  left: 0;
-  background-color: rgba(255, 255, 255, 0.7);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%0Axmlns:xlink='http://www.w3.org/1999/xlink' viewBox='0 0 23 70'%0Awidth='12px' height='35px'%3E%3Cpath fill-rule='evenodd' fill='#707070'%0Ad='M22.999,70.003 L2.379,35.000 L22.999,-0.002 L20.622,-0.002 L0.001,35.000 L20.622,70.003 L22.999,70.003 Z'/%3E%3C/svg%3E");
-  &.swiper-button-disabled {
-    opacity: 0;
-  }
-  @media screen and (max-width: 510px) {
-    display: none;
-  }
-  &:hover {
-    background-color: rgba(255, 255, 255, 0.9);
-  }
-  &:focus {
-    border: 1px solid blue;
-  }
-`;
-
-const CustomButtonNext = CustomButtonPrev.extend`
-  left: inherit;
-  right: 0;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%0Axmlns:xlink='http://www.w3.org/1999/xlink' viewBox='0 0 23 70'%0Awidth='12px' height='35px'%3E%3Cpath fill-rule='evenodd' fill='#707070'%0Ad='M0.001,-0.003 L20.621,35.000 L0.001,70.002 L2.378,70.002 L22.999,35.000 L2.378,-0.003 L0.001,-0.003 Z'/%3E%3C/svg%3E ");
-`;
-
-// const Icon = styled.span``;
 
 const disabledRealIdCheck = ({ realIndex, max, hasTwoSlides }) => {
   // checks to see if has only two slides and returns `false` this is related
