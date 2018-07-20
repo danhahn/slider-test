@@ -141,8 +141,14 @@ const doSlideUpdates = ({slidesDOM, isNext, config, swiper}) => {
   });
 };
 
-const doAnimation = (swiper, event) => {
-  const { realIndex, passedParams: { slidesPerGroup }, slides, slidesGrid } = swiper;
+const doAnimation = (swiper, event, props) => {
+  const {className, duration} = props;
+  const {
+    realIndex,
+    passedParams: { slidesPerGroup },
+    slides,
+    slidesGrid
+  } = swiper;
   const isDisabled = disabledRealIdCheck({
     realIndex,
     max: slidesGrid.length - slidesPerGroup,
@@ -152,11 +158,13 @@ const doAnimation = (swiper, event) => {
   const config = {
     realIndex,
     slidesPerGroup,
-    className: 'fade',
-    duration: 1000
+    className,
+    duration
   };
   if (doAnimateToNext) {
-    const classListGroup = event.toElement ? event.toElement.classList : event.target.classList;
+    const classListGroup = event.toElement
+      ? event.toElement.classList
+      : event.target.classList;
     const isNext = classListGroup.contains("swiper-button-next");
     const slidesDOM = Array.from(Object.values(slides));
     slidesDOM.forEach(item => {
@@ -166,23 +174,28 @@ const doAnimation = (swiper, event) => {
     });
     setTimeout(() => {
       if (isNext) {
-        doSlideUpdates({ slidesDOM, isNext, config, swiper})
+        doSlideUpdates({ slidesDOM, isNext, config, swiper });
       } else {
-        doSlideUpdates({ slidesDOM, isNext, config, swiper })
+        doSlideUpdates({ slidesDOM, isNext, config, swiper });
       }
       setTimeout(() => {
         slidesDOM.forEach(item => {
           if (item.classList && item.classList.contains(config.className)) {
             item.classList.remove(config.className);
           }
-        })
+        });
       }, config.duration);
-    }, (config.duration / 2) + 200);
+    }, config.duration / 2 + 200);
   }
-}
+};
 
 class Gallery extends React.Component {
   componentDidMount() {
+    const {duration, className} = this.props;
+    const props = {
+      duration,
+      className
+    }
     var mySwiper = document.querySelector('.swiper-container').swiper
     const next = document.querySelector(".swiper-button-next");
     const prev = document.querySelector(".swiper-button-prev");
@@ -191,29 +204,36 @@ class Gallery extends React.Component {
       event.preventDefault();
       // Number 13 is the "Enter" key on the keyboard
       if (event.keyCode === 13) {
-        doAnimation(mySwiper, event);
+        doAnimation(mySwiper, event, props);
       }
     });
     prev.addEventListener("keyup", function(event) {
       event.preventDefault();
       // Number 13 is the "Enter" key on the keyboard
       if (event.keyCode === 13) {
-        doAnimation(mySwiper, event);
+        doAnimation(mySwiper, event, props);
       }
     });
   }
 
   render() {
+    const { duration, className } = this.props;
+
+    const props = {
+      duration,
+      className
+    }
+
     const params = {
       slidesPerView: 4,
       slidesPerGroup: 4,
-      speed: 1000,
+      speed: duration,
       allowSlideNext: false,
       allowSlidePrev: false,
 
       on: {
         click(event) {
-          doAnimation(this, event);
+          doAnimation(this, event, props);
         },
         init() {
           if (window.innerWidth < 480) {
@@ -250,19 +270,9 @@ class Gallery extends React.Component {
       }
     };
 
-    const { data } = this.props;
-
     return(
       <Swiper {...params}>
-        {
-          data.map(item => (
-            <StyledSwipe key={item}>
-              <Inner>
-                <Slide i={item} />
-              </Inner>
-            </StyledSwipe>
-          ))
-        }
+        {this.props.render()}
       </Swiper>
     );
   }

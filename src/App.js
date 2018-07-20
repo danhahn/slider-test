@@ -1,11 +1,50 @@
 import React from 'react';
 import Gallery from './gallery';
+import styled from "styled-components";
+import Slide from "./slide";
 import './App.css';
 
 const data = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16];
 
+const StyledSwipe = styled.div`
+  /* border: 1px solid black; */
+  height: 300px;
+  box-sizing: border-box;
+  display: flex;
+  &.fade {
+    border-color: red;
+    .imageWrapper img {
+      opacity: 0;
+    }
+    p {
+      opacity: 0;
+    }
+  }
+`;
+
+const Inner = styled.div`
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  .imageWrapper {
+    background-color: gray;
+  }
+  img {
+    transition: all 1s;
+    max-width: 100%;
+  }
+  p {
+    transition: all 1s;
+    margin: 1em;
+  }
+`;
+
 class Example extends React.Component {
+
   render() {
+    const data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
+
     return <div style={{ padding: 20 }}>
         <h2>Before</h2>
         <p>
@@ -26,7 +65,17 @@ class Example extends React.Component {
           Quasi velit dolorem quos veritatis animi quisquam laboriosam
           accusamus! Quia in quas natus consequuntur.
         </p>
-        <Gallery data={data} />
+        <Gallery duration={1000} className={'fade'} render={
+          () => (
+            data.map(item => (
+              <StyledSwipe key={item}>
+                <Inner>
+                  <Slide i={item} />
+                </Inner>
+              </StyledSwipe>
+            ))
+          )
+        } />
         <h3>after</h3>
         <p>
           Lorem ipsum dolor sit amet consectetur adipisicing elit. Et ipsa,
