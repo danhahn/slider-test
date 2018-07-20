@@ -109,17 +109,36 @@ const checkAnimateToNext = (event, isDisabled) => {
   return false;
 };
 
-const doSlideUpdates = slidesDOM => {
-  // return slidesDOM
-  //   .slice(nextStart, nextStart + slidesPerGroup)
-  //   .reverse()
-  //   .forEach((item, index) => {
-  //     setTimeout(() => {
-  //       if (item.classList && item.classList.contains("fade")) {
-  //         item.classList.remove("fade");
-  //       }
-  //     }, (1000 / slidesPerGroup) * index);
-  //   });
+const doSlideUpdates = ({slidesDOM, isNext, config, swiper}) => {
+  const dir = isNext ? 'Next' : 'Prev';
+  const {
+    realIndex,
+    slidesPerGroup,
+    className,
+    duration
+  } = config;
+
+  const nextStart = isNext
+    ? realIndex + slidesPerGroup
+    : realIndex - slidesPerGroup;
+
+  swiper[`allowSlide${dir}`] = true;
+  swiper[`slide${dir}`](0);
+  swiper[`allowSlide${dir}`] = false;
+
+  let slidesSliced = slidesDOM.slice(nextStart, nextStart + slidesPerGroup);
+
+  if (isNext) {
+    slidesSliced = slidesSliced.reverse();
+  }
+
+  slidesSliced.forEach((item, index) => {
+    setTimeout(() => {
+      if (item.classList && item.classList.contains(className)) {
+        item.classList.remove(className);
+      }
+    }, (duration / slidesPerGroup) * index);
+  });
 };
 
 const doAnimation = (swiper, event) => {
@@ -130,55 +149,35 @@ const doAnimation = (swiper, event) => {
     hasTwoSlides: slidesGrid.length / slidesPerGroup === 2
   });
   const doAnimateToNext = checkAnimateToNext(event, isDisabled);
+  const config = {
+    realIndex,
+    slidesPerGroup,
+    className: 'fade',
+    duration: 1000
+  };
   if (doAnimateToNext) {
-    const cl = event.toElement ? event.toElement.classList : event.target.classList;
-    const isNext = cl.contains("swiper-button-next");
+    const classListGroup = event.toElement ? event.toElement.classList : event.target.classList;
+    const isNext = classListGroup.contains("swiper-button-next");
     const slidesDOM = Array.from(Object.values(slides));
     slidesDOM.forEach(item => {
       if (item.classList) {
-        item.classList.add("fade");
+        item.classList.add(config.className);
       }
     });
     setTimeout(() => {
       if (isNext) {
-        swiper.allowSlideNext = true;
-        swiper.slideNext(0);
-        swiper.allowSlideNext = false;
-        const nextStart = realIndex + slidesPerGroup;
-        slidesDOM
-          .slice(nextStart, nextStart + slidesPerGroup)
-          .reverse()
-          .forEach((item, index) => {
-            setTimeout(() => {
-              if (item.classList && item.classList.contains('fade')) {
-                item.classList.remove("fade");
-              }
-            }, (1000 / slidesPerGroup) * index);
-          });
+        doSlideUpdates({ slidesDOM, isNext, config, swiper})
       } else {
-        swiper.allowSlidePrev = true;
-        swiper.slidePrev(0);
-        swiper.allowSlidePrev = false;
-        const nextStart = realIndex - slidesPerGroup;
-        slidesDOM
-          .slice(nextStart, nextStart + slidesPerGroup)
-          // .reverse()
-          .forEach((item, index) => {
-            setTimeout(() => {
-              if (item.classList && item.classList.contains('fade')) {
-                item.classList.remove("fade");
-              }
-            }, (1000 / slidesPerGroup) * index);
-          });
+        doSlideUpdates({ slidesDOM, isNext, config, swiper })
       }
       setTimeout(() => {
         slidesDOM.forEach(item => {
-          if (item.classList && item.classList.contains('fade')) {
-            item.classList.remove('fade');
+          if (item.classList && item.classList.contains(config.className)) {
+            item.classList.remove(config.className);
           }
         })
-      }, 1000);
-    }, (1000 / 2) + 200);
+      }, config.duration);
+    }, (config.duration / 2) + 200);
   }
 }
 
