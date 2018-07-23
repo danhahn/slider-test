@@ -71,7 +71,7 @@ const CustomButtonNext = CustomButtonPrev.extend`
 class Example extends React.Component {
 
   render() {
-    const data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
+    const data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 
     return <div style={{ padding: 20 }}>
         <h2>Before</h2>

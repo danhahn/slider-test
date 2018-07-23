@@ -10,7 +10,7 @@ const disabledRealIdCheck = ({ realIndex, max, hasTwoSlides }) => {
   }
   // return true if the realID is 0 but has more than two slides
   if (realIndex === 0) {
-    return true;
+    // return true;
   }
 
   if (realIndex === max && !hasTwoSlides) {
@@ -24,7 +24,6 @@ const checkAnimateToNext = (event, isDisabled) => {
   const prev = 'swiper-button-prev';
   const disabled = "swiper-button-disabled";
   const cl = event.toElement ? event.toElement.classList : event.target.classList;
-  console.log({ isDisabled})
   if (!!cl.value) {
     // check if `imageWrapper` if yes return 'false'
     if (cl.contains("imageWrapper")) {
@@ -44,7 +43,7 @@ const checkAnimateToNext = (event, isDisabled) => {
 };
 
 const doSlideUpdates = ({slidesDOM, isNext, config, swiper}) => {
-  const dir = isNext ? 'Next' : 'Prev';
+  const direction = isNext ? 'Next' : 'Prev';
   const {
     realIndex,
     slidesPerGroup,
@@ -56,9 +55,9 @@ const doSlideUpdates = ({slidesDOM, isNext, config, swiper}) => {
     ? realIndex + slidesPerGroup
     : realIndex - slidesPerGroup;
 
-  swiper[`allowSlide${dir}`] = true;
-  swiper[`slide${dir}`](0);
-  swiper[`allowSlide${dir}`] = false;
+  swiper[`allowSlide${direction}`] = true;
+  swiper[`slide${direction}`](0);
+  swiper[`allowSlide${direction}`] = false;
 
   let slidesSliced = slidesDOM.slice(nextStart, nextStart + slidesPerGroup);
 
@@ -76,6 +75,7 @@ const doSlideUpdates = ({slidesDOM, isNext, config, swiper}) => {
 };
 
 const doAnimation = (swiper, event, props) => {
+  console.dir(event.toElement)
   const {className, duration} = props;
   const {
     realIndex,
@@ -86,7 +86,7 @@ const doAnimation = (swiper, event, props) => {
   const isDisabled = disabledRealIdCheck({
     realIndex,
     max: slidesGrid.length - slidesPerGroup,
-    hasTwoSlides: slidesGrid.length / slidesPerGroup === 2
+    hasTwoSlides: slidesGrid.length <= slidesGrid.length * 2
   });
   const doAnimateToNext = checkAnimateToNext(event, isDisabled);
   const config = {
