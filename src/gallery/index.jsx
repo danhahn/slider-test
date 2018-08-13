@@ -75,7 +75,6 @@ const doSlideUpdates = ({slidesDOM, isNext, config, swiper}) => {
 };
 
 const doAnimation = (swiper, event, props) => {
-  console.dir(event.toElement)
   const {className, duration} = props;
   const {
     realIndex,
@@ -119,37 +118,33 @@ const doAnimation = (swiper, event, props) => {
           }
         });
       }, config.duration);
-    }, config.duration / 2 + 200);
+    }, config.duration);
   }
 };
 
 class Gallery extends React.Component {
+  static defaultProps = {
+    duration: 1000,
+    className: 'fade'
+  };
+
   componentDidMount() {
     setTimeout(() => {
-      const {duration, className} = this.props;
-      const props = {
-        duration,
-        className
-      }
-      var mySwiper = document.querySelector('.swiper-container').swiper
-      const next = document.querySelector(".swiper-button-next");
-      const prev = document.querySelector(".swiper-button-prev");
+      var mySwiper = document.querySelector(".swiper-container").swiper;
+      this.setState({ mySwiper });
+    }, 1);
+  }
 
-      next.addEventListener("keyup", (event) => {
-        event.preventDefault();
-        // Number 13 is the "Enter" key on the keyboard
-        if (event.keyCode === 13) {
-          doAnimation(mySwiper, event, props);
-        }
-      });
-      prev.addEventListener("keyup", function(event) {
-        event.preventDefault();
-        // Number 13 is the "Enter" key on the keyboard
-        if (event.keyCode === 13) {
-          doAnimation(mySwiper, event, props);
-        }
-      });
-    }, 1000)
+  handleKeyPress(event) {
+    const { duration, className } = this.props;
+    const config = {
+      duration,
+      className
+    };
+    if (event.key === " " || event.key === "Enter") {
+      event.preventDefault();
+      doAnimation(this.state.mySwiper, event, config);
+    }
   }
 
   render() {
@@ -158,7 +153,7 @@ class Gallery extends React.Component {
     const props = {
       duration,
       className
-    }
+    };
 
     const params = {
       slidesPerView: 4,
@@ -177,26 +172,11 @@ class Gallery extends React.Component {
             this.allowSlidePrev = true;
             const el = document.querySelector(".swiper-container");
             setTimeout(() => {
-              el.classList.add('margin-offset')
-            }, 100)
+              el.classList.add("margin-offset");
+            }, 100);
           }
         }
       },
-
-      renderPrevButton: () => ({
-        ...prevButton,
-        props: {
-          ...prevButton.props,
-          className: 'swiper-button-prev'
-        }
-      }),
-      renderNextButton: () => ({
-        ...nextButton,
-        props: {
-          ...nextButton.props,
-          className: 'swiper-button-next'
-        }
-      }),
 
       navigation: {
         nextEl: ".swiper-button-next",
@@ -209,16 +189,34 @@ class Gallery extends React.Component {
           slidesPerView: 2,
           slidesPerGroup: 2,
           spaceBetween: 0,
-          freeMode: true,
+          freeMode: true
         }
       }
     };
+    // check if prevButton is passed and add to params
+    if (prevButton) {
+      params.renderPrevButton = () => ({
+        ...prevButton,
+        props: {
+          ...prevButton.props,
+          className: "swiper-button-prev",
+          onKeyPress: event => this.handleKeyPress(event)
+        }
+      });
+    }
+    // check if nextButton is passed and add to params
+    if (nextButton) {
+      params.renderNextButton = () => ({
+        ...nextButton,
+        props: {
+          ...nextButton.props,
+          className: "swiper-button-next",
+          onKeyPress: event => this.handleKeyPress(event)
+        }
+      });
+    }
 
-    return(
-      <Swiper {...params}>
-        {this.props.render()}
-      </Swiper>
-    );
+    return <Swiper {...params}>{this.props.render()}</Swiper>;
   }
 }
 

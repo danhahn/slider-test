@@ -8,11 +8,10 @@ const data = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16];
 
 const StyledSwipe = styled.div`
   /* border: 1px solid black; */
-  height: 300px;
-  box-sizing: border-box;
-  display: flex;
+  /* height: 300px; */
+  /* box-sizing: border-box;
+  display: flex; */
   &.fade {
-    border-color: red;
     .imageWrapper img {
       opacity: 0;
     }
@@ -28,7 +27,7 @@ const Inner = styled.div`
   justify-content: center;
   align-items: center;
   .imageWrapper {
-    background-color: gray;
+    background-color: rebeccapurple;
   }
   img {
     transition: all 1s;
@@ -48,17 +47,16 @@ const CustomButtonPrev = styled.button`
   left: 0;
   background-color: rgba(255, 255, 255, 0.7);
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%0Axmlns:xlink='http://www.w3.org/1999/xlink' viewBox='0 0 23 70'%0Awidth='12px' height='35px'%3E%3Cpath fill-rule='evenodd' fill='#707070'%0Ad='M22.999,70.003 L2.379,35.000 L22.999,-0.002 L20.622,-0.002 L0.001,35.000 L20.622,70.003 L22.999,70.003 Z'/%3E%3C/svg%3E");
+  transition: background-color 750ms;
   &.swiper-button-disabled {
     opacity: 0;
   }
   @media screen and (max-width: 510px) {
     display: none;
   }
-  &:hover {
-    background-color: rgba(255, 255, 255, 0.9);
-  }
+  &:hover,
   &:focus {
-    border: 1px solid blue;
+    background-color: rgba(255, 255, 255, 0.9);
   }
 `;
 
@@ -73,7 +71,7 @@ class Example extends React.Component {
   render() {
     const data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 
-    return <div style={{ padding: 20 }}>
+    return <div style={{ padding: 20, maxWidth: 1000, margin: '0 auto' }}>
         <h2>Before</h2>
         <p>
           Lorem, ipsum dolor sit amet consectetur adipisicing elit.
@@ -94,8 +92,8 @@ class Example extends React.Component {
           accusamus! Quia in quas natus consequuntur.
         </p>
         <Gallery
-        duration={1000}
-        className={'fade'}
+        // duration={400}
+        // className={'fade'}
         nextButton={<CustomButtonNext />}
         prevButton={<CustomButtonPrev />}
         render={
