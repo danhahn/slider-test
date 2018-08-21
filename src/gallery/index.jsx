@@ -185,7 +185,7 @@ class Gallery extends React.Component {
         init() {
           if (window.innerWidth < 480) {
             console.log(this);
-            setTimeout(() => {
+            // setTimeout(() => {
               this.$el[0].classList.add('margin-offset');
               // this.slidesGrid = this.slidesGrid.map((slide, i) => {
               //   const newSlide = slide === -0 ? slide : slide - ((11 + 15) * i);
@@ -200,7 +200,7 @@ class Gallery extends React.Component {
               this.allowSlidePrev = true;
               const slides = Array.from(this.$el[0].children[0].children);
               slides.forEach(slide => (slide.style.width = `${parseInt(slide.style.width, 10) - 11}px`));
-            }, 1000);
+            // }, 1000);
           }
         },
         resize() {
