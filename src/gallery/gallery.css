@@ -1,5 +1,5 @@
 @media screen and (max-width: 480px) {
-  .margin-offset {
+  .swiper-container.margin-offset {
     margin-right: -20px;
     padding-right: 20px;
   }

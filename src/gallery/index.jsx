@@ -42,7 +42,7 @@ const checkAnimateToNext = (event, isDisabled) => {
   return false;
 };
 
-const doSlideUpdates = ({slidesDOM, isNext, config, swiper}) => {
+const doSlideUpdates = ({ slidesDOM, isNext, config, swiper }) => {
   const direction = isNext ? 'Next' : 'Prev';
   const {
     realIndex,
@@ -61,7 +61,7 @@ const doSlideUpdates = ({slidesDOM, isNext, config, swiper}) => {
 
   let slidesSliced = slidesDOM.slice(nextStart, nextStart + slidesPerGroup);
 
-  if (isNext) {
+  if (!isNext) {
     slidesSliced = slidesSliced.reverse();
   }
 
@@ -75,7 +75,7 @@ const doSlideUpdates = ({slidesDOM, isNext, config, swiper}) => {
 };
 
 const doAnimation = (swiper, event, props) => {
-  const {className, duration} = props;
+  const { className, duration } = props;
   const {
     realIndex,
     passedParams: { slidesPerGroup },
@@ -122,17 +122,33 @@ const doAnimation = (swiper, event, props) => {
   }
 };
 
+const adjustArrowOffset = () => {
+  const height = document.querySelector('.swiper-slide img').getBoundingClientRect().height / 2;
+  const next = document.querySelector('.swiper-button-next');
+  next.style.top = `${height}px`;
+  next.classList.add('adjusted');
+  const prev = document.querySelector('.swiper-button-prev');
+  prev.style.top = `${height}px`;
+  prev.classList.add('adjusted');
+};
+
 class Gallery extends React.Component {
   static defaultProps = {
-    duration: 1000,
+    duration: 400,
     className: 'fade'
   };
 
   componentDidMount() {
     setTimeout(() => {
-      var mySwiper = document.querySelector(".swiper-container").swiper;
+      const mySwiper = document.querySelector(".swiper-container").swiper;
       this.setState({ mySwiper });
-    }, 1);
+      adjustArrowOffset();
+    }, 200);
+    window.addEventListener('resize', adjustArrowOffset);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', adjustArrowOffset);
   }
 
   handleKeyPress(event) {
@@ -168,12 +184,43 @@ class Gallery extends React.Component {
         },
         init() {
           if (window.innerWidth < 480) {
-            this.allowSlideNext = true;
-            this.allowSlidePrev = true;
-            const el = document.querySelector(".swiper-container");
+            console.log(this);
             setTimeout(() => {
-              el.classList.add("margin-offset");
-            }, 100);
+              this.$el[0].classList.add('margin-offset');
+              this.slidesGrid = this.slidesGrid.map((slide, i) => {
+                const newSlide = slide === -0 ? slide : slide - ((11 + 15) * i);
+                return newSlide;
+              });
+              this.snapGrid = this.snapGrid.map((slide, i) => {
+                const newSlide = slide === -0 ? slide : slide - (11 + 15) * i;
+                return newSlide;
+              });
+              this.slidesSizesGrid = this.slidesSizesGrid.map(slide => slide - 11);
+              this.allowSlideNext = true;
+              this.allowSlidePrev = true;
+              Object.values(this.slides).forEach(item => {
+                if(item.style) {
+                  item.swiperSlideSize = item.swiperSlideSize -11;
+                  item.style.width = `${parseInt(item.style.width, 10) - 11}px`;
+                }
+              })
+            }, 200);
+          }
+        },
+        resize() {
+          if (window.innerWidth < 480) {
+            this.allowSlidePrev = true;
+            this.allowSlideNext = true;
+            const el = document.querySelectorAll(".swiper-container");
+            el.forEach(swiper => {
+              if (!swiper.classList.contains("margin-offset")) {
+                swiper.classList.add("margin-offset");
+              }
+            });
+            document.querySelectorAll('.swiper-slide')
+              .forEach(item => {
+                item.style.width = `${parseInt(item.style.width, 10) - 11}px`;
+              });
           }
         }
       },
@@ -188,7 +235,7 @@ class Gallery extends React.Component {
         480: {
           slidesPerView: 2,
           slidesPerGroup: 2,
-          spaceBetween: 0,
+          spaceBetween: 15,
           freeMode: true
         }
       }

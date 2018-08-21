@@ -70,6 +70,7 @@ class Example extends React.Component {
 
   render() {
     const data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+    const data2 = [1, 2, 3, 4, 5, 6, 7, 8];
 
     return <div style={{ padding: 20, maxWidth: 1000, margin: '0 auto' }}>
         <h2>Before</h2>
@@ -99,6 +100,23 @@ class Example extends React.Component {
         render={
           () => (
             data.map(item => (
+              <StyledSwipe key={item}>
+                <Inner>
+                  <Slide i={item} />
+                </Inner>
+              </StyledSwipe>
+            ))
+          )
+        } />
+        <h2>#2</h2>
+        <Gallery
+        // duration={400}
+        // className={'fade'}
+        nextButton={<CustomButtonNext />}
+        prevButton={<CustomButtonPrev />}
+        render={
+          () => (
+            data2.map(item => (
               <StyledSwipe key={item}>
                 <Inner>
                   <Slide i={item} />
