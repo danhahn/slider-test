@@ -187,15 +187,15 @@ class Gallery extends React.Component {
             console.log(this);
             // setTimeout(() => {
               this.$el[0].classList.add('margin-offset');
-              // this.slidesGrid = this.slidesGrid.map((slide, i) => {
-              //   const newSlide = slide === -0 ? slide : slide - ((11 + 15) * i);
-              //   return newSlide;
-              // });
-              // this.snapGrid = this.snapGrid.map((slide, i) => {
-              //   const newSlide = slide === -0 ? slide : slide - (11 + 15) * i;
-              //   return newSlide;
-              // });
-              // this.slidesSizesGrid = this.slidesSizesGrid.map(slide => slide - 11);
+              this.slidesGrid = this.slidesGrid.map((slide, i) => {
+                const newSlide = slide === -0 ? slide : slide - ((11 + 15) * i);
+                return newSlide;
+              });
+              this.snapGrid = this.snapGrid.map((slide, i) => {
+                const newSlide = slide === -0 ? slide : slide - (11 + 15) * i;
+                return newSlide;
+              });
+              this.slidesSizesGrid = this.slidesSizesGrid.map(slide => slide - 11);
               this.allowSlideNext = true;
               this.allowSlidePrev = true;
               const slides = Array.from(this.$el[0].children[0].children);
