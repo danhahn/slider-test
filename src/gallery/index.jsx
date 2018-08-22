@@ -123,23 +123,19 @@ const doAnimation = (swiper, event, props) => {
 };
 
 const adjustArrowOffset = swiper => {
-  setTimeout(() => {
-    const height = swiper.imagesToLoad[0].offsetHeight / 2;
-    const next = swiper.navigation.nextEl;
-    next.style.top = `${height}px`;
-    const prev = swiper.navigation.prevEl;
-    prev.style.top = `${height}px`;
-  }, 500)
+  const height = swiper.imagesToLoad[0].offsetHeight / 2;
+  const next = swiper.navigation.nextEl;
+  next.style.top = `${height}px`;
+  const prev = swiper.navigation.prevEl;
+  prev.style.top = `${height}px`;
 };
 
 const fixMobileSlides = swiper => {
   if (window.innerWidth < 480) {
-    swiper.allowSlideNext = true;
-    swiper.allowSlidePrev = true;
     setTimeout(() => {
       swiper.$el[0].classList.add('margin-offset');
       swiper.slidesGrid = swiper.slidesGrid.map((slide, i) => {
-        const newSlide = slide === -0 ? slide : slide - (11 + 15) * i;
+        const newSlide = slide === -0 ? slide : slide - ((11 + 15) * i);
         return newSlide;
       });
       swiper.snapGrid = swiper.snapGrid.map((slide, i) => {
@@ -147,9 +143,11 @@ const fixMobileSlides = swiper => {
         return newSlide;
       });
       swiper.slidesSizesGrid = swiper.slidesSizesGrid.map(slide => slide - 11);
+      swiper.allowSlideNext = true;
+      swiper.allowSlidePrev = true;
       const slides = Array.from(swiper.$el[0].children[0].children);
       slides.forEach(slide => (slide.style.width = `${parseInt(slide.style.width, 10) - 11}px`));
-    }, 500)
+    }, 200)
   }
 };
 
@@ -210,21 +208,21 @@ class Gallery extends React.Component {
           doAnimation(this, event, props);
         },
         resize() {
-          // if (window.innerWidth < 480) {
-          //   this.allowSlidePrev = true;
-          //   this.allowSlideNext = true;
-          //   // const el = document.querySelectorAll(".swiper-container");
-          //   // el.forEach(swiper => {
-          //   //   if (!swiper.classList.contains("margin-offset")) {
-          //   //     swiper.classList.add("margin-offset");
-          //   //   }
-          //   // });
-          //   // document.querySelectorAll('.swiper-slide')
-          //   //   .forEach(item => {
-          //   //     item.style.width = `${parseInt(item.style.width, 10) - 11}px`;
-          //   //   });
-          // }
-          fixMobileSlides(this);
+          if (window.innerWidth < 480) {
+            this.slidesGrid = this.slidesGrid.map((slide, i) => {
+              const newSlide = slide === -0 ? slide : slide - ((11 + 15) * i);
+              return newSlide;
+            });
+            this.snapGrid = this.snapGrid.map((slide, i) => {
+              const newSlide = slide === -0 ? slide : slide - (11 + 15) * i;
+              return newSlide;
+            });
+            this.slidesSizesGrid = this.slidesSizesGrid.map(slide => slide - 11);
+            this.allowSlideNext = true;
+            this.allowSlidePrev = true;
+            const slides = Array.from(this.$el[0].children[0].children);
+            slides.forEach(slide => (slide.style.width = `${parseInt(slide.style.width, 10) - 11}px`));
+          }
         }
       },
 
