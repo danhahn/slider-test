@@ -132,18 +132,46 @@ const adjustArrowOffset = () => {
   prev.classList.add('adjusted');
 };
 
+const fixMobileSlides = swiper => {
+  console.log(swiper.imagesLoaded);
+  if (window.innerWidth < 480) {
+    // setTimeout(() => {
+      swiper.$el[0].classList.add('margin-offset');
+      swiper.slidesGrid = swiper.slidesGrid.map((slide, i) => {
+        const newSlide = slide === -0 ? slide : slide - ((11 + 15) * i);
+        return newSlide;
+      });
+      swiper.snapGrid = swiper.snapGrid.map((slide, i) => {
+        const newSlide = slide === -0 ? slide : slide - (11 + 15) * i;
+        return newSlide;
+      });
+      swiper.slidesSizesGrid = swiper.slidesSizesGrid.map(slide => slide - 11);
+      swiper.allowSlideNext = true;
+      swiper.allowSlidePrev = true;
+      const slides = Array.from(swiper.$el[0].children[0].children);
+      slides.forEach(slide => (slide.style.width = `${parseInt(slide.style.width, 10) - 11}px`));
+    // }, 500);
+  }
+};
+
 class Gallery extends React.Component {
   static defaultProps = {
     duration: 400,
     className: 'fade'
   };
 
+  constructor(props) {
+    super(props);
+    this.swiper = null;
+  }
+
   componentDidMount() {
-    setTimeout(() => {
-      const mySwiper = document.querySelector(".swiper-container").swiper;
-      this.setState({ mySwiper });
+    // setTimeout(() => {
+      // console.log(this.swiper.imagesLoaded);
+      fixMobileSlides(this.swiper)
+      this.setState({ swiper: this.swiper });
       adjustArrowOffset();
-    }, 200);
+    // }, 200);
     window.addEventListener('resize', adjustArrowOffset);
   }
 
@@ -183,25 +211,24 @@ class Gallery extends React.Component {
           doAnimation(this, event, props);
         },
         init() {
-          if (window.innerWidth < 480) {
-            console.log(this);
-            // setTimeout(() => {
-              this.$el[0].classList.add('margin-offset');
-              this.slidesGrid = this.slidesGrid.map((slide, i) => {
-                const newSlide = slide === -0 ? slide : slide - ((11 + 15) * i);
-                return newSlide;
-              });
-              this.snapGrid = this.snapGrid.map((slide, i) => {
-                const newSlide = slide === -0 ? slide : slide - (11 + 15) * i;
-                return newSlide;
-              });
-              this.slidesSizesGrid = this.slidesSizesGrid.map(slide => slide - 11);
-              this.allowSlideNext = true;
-              this.allowSlidePrev = true;
-              const slides = Array.from(this.$el[0].children[0].children);
-              slides.forEach(slide => (slide.style.width = `${parseInt(slide.style.width, 10) - 11}px`));
-            // }, 1000);
-          }
+          // if (window.innerWidth < 480) {
+          //   setTimeout(() => {
+          //     this.$el[0].classList.add('margin-offset');
+          //     this.slidesGrid = this.slidesGrid.map((slide, i) => {
+          //       const newSlide = slide === -0 ? slide : slide - ((11 + 15) * i);
+          //       return newSlide;
+          //     });
+          //     this.snapGrid = this.snapGrid.map((slide, i) => {
+          //       const newSlide = slide === -0 ? slide : slide - (11 + 15) * i;
+          //       return newSlide;
+          //     });
+          //     this.slidesSizesGrid = this.slidesSizesGrid.map(slide => slide - 11);
+          //     this.allowSlideNext = true;
+          //     this.allowSlidePrev = true;
+          //     const slides = Array.from(this.$el[0].children[0].children);
+          //     slides.forEach(slide => (slide.style.width = `${parseInt(slide.style.width, 10) - 11}px`));
+          //   }, 500);
+          // }
         },
         resize() {
           if (window.innerWidth < 480) {
@@ -259,7 +286,18 @@ class Gallery extends React.Component {
       });
     }
 
-    return <Swiper {...params}>{this.props.render()}</Swiper>;
+    return (
+      <Swiper
+        {...params}
+        ref={node => {
+          if (node) {
+            this.swiper = node.swiper;
+          }
+        }}
+      >
+        {this.props.render()}
+      </Swiper>
+    );
   }
 }
 
