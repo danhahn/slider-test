@@ -133,9 +133,9 @@ const adjustArrowOffset = () => {
 };
 
 const fixMobileSlides = swiper => {
-  console.log(swiper.imagesLoaded);
+  console.log(swiper.slidesGrid);
   if (window.innerWidth < 480) {
-    // setTimeout(() => {
+    setTimeout(() => {
       swiper.$el[0].classList.add('margin-offset');
       swiper.slidesGrid = swiper.slidesGrid.map((slide, i) => {
         const newSlide = slide === -0 ? slide : slide - ((11 + 15) * i);
@@ -150,7 +150,8 @@ const fixMobileSlides = swiper => {
       swiper.allowSlidePrev = true;
       const slides = Array.from(swiper.$el[0].children[0].children);
       slides.forEach(slide => (slide.style.width = `${parseInt(slide.style.width, 10) - 11}px`));
-    // }, 500);
+      console.log(swiper.slidesGrid);
+    }, 1000)
   }
 };
 
@@ -163,15 +164,15 @@ class Gallery extends React.Component {
   constructor(props) {
     super(props);
     this.swiper = null;
+    this.state = {
+      swiper: null
+    }
   }
 
   componentDidMount() {
-    // setTimeout(() => {
-      // console.log(this.swiper.imagesLoaded);
-      fixMobileSlides(this.swiper)
-      this.setState({ swiper: this.swiper });
-      adjustArrowOffset();
-    // }, 200);
+    fixMobileSlides(this.swiper)
+    this.setState({ swiper: this.swiper });
+    adjustArrowOffset();
     window.addEventListener('resize', adjustArrowOffset);
   }
 
@@ -209,26 +210,6 @@ class Gallery extends React.Component {
       on: {
         click(event) {
           doAnimation(this, event, props);
-        },
-        init() {
-          // if (window.innerWidth < 480) {
-          //   setTimeout(() => {
-          //     this.$el[0].classList.add('margin-offset');
-          //     this.slidesGrid = this.slidesGrid.map((slide, i) => {
-          //       const newSlide = slide === -0 ? slide : slide - ((11 + 15) * i);
-          //       return newSlide;
-          //     });
-          //     this.snapGrid = this.snapGrid.map((slide, i) => {
-          //       const newSlide = slide === -0 ? slide : slide - (11 + 15) * i;
-          //       return newSlide;
-          //     });
-          //     this.slidesSizesGrid = this.slidesSizesGrid.map(slide => slide - 11);
-          //     this.allowSlideNext = true;
-          //     this.allowSlidePrev = true;
-          //     const slides = Array.from(this.$el[0].children[0].children);
-          //     slides.forEach(slide => (slide.style.width = `${parseInt(slide.style.width, 10) - 11}px`));
-          //   }, 500);
-          // }
         },
         resize() {
           if (window.innerWidth < 480) {
@@ -287,16 +268,19 @@ class Gallery extends React.Component {
     }
 
     return (
-      <Swiper
-        {...params}
-        ref={node => {
-          if (node) {
-            this.swiper = node.swiper;
-          }
-        }}
-      >
-        {this.props.render()}
-      </Swiper>
+      <div>
+        <h2>{this.state.swiper ? this.state.swiper.slidesGrid.pop() : ''}</h2>
+        <Swiper
+          {...params}
+          ref={node => {
+            if (node) {
+              this.swiper = node.swiper;
+            }
+          }}
+        >
+          {this.props.render()}
+        </Swiper>
+      </div>
     );
   }
 }
