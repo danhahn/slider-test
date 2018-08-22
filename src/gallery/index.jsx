@@ -122,23 +122,24 @@ const doAnimation = (swiper, event, props) => {
   }
 };
 
-const adjustArrowOffset = () => {
-  const height = document.querySelector('.swiper-slide img').getBoundingClientRect().height / 2;
-  const next = document.querySelector('.swiper-button-next');
-  next.style.top = `${height}px`;
-  next.classList.add('adjusted');
-  const prev = document.querySelector('.swiper-button-prev');
-  prev.style.top = `${height}px`;
-  prev.classList.add('adjusted');
+const adjustArrowOffset = swiper => {
+  setTimeout(() => {
+    const height = swiper.imagesToLoad[0].offsetHeight / 2;
+    const next = swiper.navigation.nextEl;
+    next.style.top = `${height}px`;
+    const prev = swiper.navigation.prevEl;
+    prev.style.top = `${height}px`;
+  }, 500)
 };
 
 const fixMobileSlides = swiper => {
-  console.log(swiper.slidesGrid);
   if (window.innerWidth < 480) {
+    swiper.allowSlideNext = true;
+    swiper.allowSlidePrev = true;
     setTimeout(() => {
       swiper.$el[0].classList.add('margin-offset');
       swiper.slidesGrid = swiper.slidesGrid.map((slide, i) => {
-        const newSlide = slide === -0 ? slide : slide - ((11 + 15) * i);
+        const newSlide = slide === -0 ? slide : slide - (11 + 15) * i;
         return newSlide;
       });
       swiper.snapGrid = swiper.snapGrid.map((slide, i) => {
@@ -146,12 +147,9 @@ const fixMobileSlides = swiper => {
         return newSlide;
       });
       swiper.slidesSizesGrid = swiper.slidesSizesGrid.map(slide => slide - 11);
-      swiper.allowSlideNext = true;
-      swiper.allowSlidePrev = true;
       const slides = Array.from(swiper.$el[0].children[0].children);
       slides.forEach(slide => (slide.style.width = `${parseInt(slide.style.width, 10) - 11}px`));
-      console.log(swiper.slidesGrid);
-    }, 1000)
+    }, 500)
   }
 };
 
@@ -170,14 +168,14 @@ class Gallery extends React.Component {
   }
 
   componentDidMount() {
-    fixMobileSlides(this.swiper)
     this.setState({ swiper: this.swiper });
-    adjustArrowOffset();
-    window.addEventListener('resize', adjustArrowOffset);
+    fixMobileSlides(this.swiper)
+    adjustArrowOffset(this.swiper);
+    window.addEventListener('resize', () => adjustArrowOffset(this.swiper));
   }
 
   componentWillUnmount() {
-    window.removeEventListener('resize', adjustArrowOffset);
+    window.removeEventListener('resize', () => adjustArrowOffset(this.swiper));
   }
 
   handleKeyPress(event) {
@@ -212,20 +210,21 @@ class Gallery extends React.Component {
           doAnimation(this, event, props);
         },
         resize() {
-          if (window.innerWidth < 480) {
-            this.allowSlidePrev = true;
-            this.allowSlideNext = true;
-            const el = document.querySelectorAll(".swiper-container");
-            el.forEach(swiper => {
-              if (!swiper.classList.contains("margin-offset")) {
-                swiper.classList.add("margin-offset");
-              }
-            });
-            document.querySelectorAll('.swiper-slide')
-              .forEach(item => {
-                item.style.width = `${parseInt(item.style.width, 10) - 11}px`;
-              });
-          }
+          // if (window.innerWidth < 480) {
+          //   this.allowSlidePrev = true;
+          //   this.allowSlideNext = true;
+          //   // const el = document.querySelectorAll(".swiper-container");
+          //   // el.forEach(swiper => {
+          //   //   if (!swiper.classList.contains("margin-offset")) {
+          //   //     swiper.classList.add("margin-offset");
+          //   //   }
+          //   // });
+          //   // document.querySelectorAll('.swiper-slide')
+          //   //   .forEach(item => {
+          //   //     item.style.width = `${parseInt(item.style.width, 10) - 11}px`;
+          //   //   });
+          // }
+          fixMobileSlides(this);
         }
       },
 
@@ -268,19 +267,16 @@ class Gallery extends React.Component {
     }
 
     return (
-      <div>
-        <h2>{this.state.swiper ? this.state.swiper.slidesGrid.pop() : ''}</h2>
-        <Swiper
-          {...params}
-          ref={node => {
-            if (node) {
-              this.swiper = node.swiper;
-            }
-          }}
-        >
-          {this.props.render()}
-        </Swiper>
-      </div>
+      <Swiper
+        {...params}
+        ref={node => {
+          if (node) {
+            this.swiper = node.swiper;
+          }
+        }}
+      >
+        {this.props.render()}
+      </Swiper>
     );
   }
 }
