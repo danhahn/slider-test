@@ -1,5 +1,5 @@
 import React from 'react';
-import Swiper from 'react-id-swiper';
+import Swiper from 'react-id-swiper/lib/custom';
 import './gallery.css';
 
 const disabledRealIdCheck = ({ realIndex, max, hasTwoSlides }) => {
@@ -102,23 +102,30 @@ const doAnimation = (swiper, event, props) => {
     const slidesDOM = Array.from(Object.values(slides));
     slidesDOM.forEach(item => {
       if (item.classList) {
+        const image = item.querySelector('.image-panel img');
+        const quickview = item.querySelector('.image-panel .quickview-container');
+        const lis = item.querySelectorAll('li');
+        const fadeElements = [image, quickview, ...lis];
+        fadeElements.forEach(element => {
+          element.style.transitionDuration = `${config.duration}ms`;
+        });
         item.classList.add(config.className);
       }
     });
-    setTimeout(() => {
-      if (isNext) {
+    const [firstSlide] = slidesDOM;
+    firstSlide.addEventListener('transitionend', function cb(event) {
+      if (event.target.classList.contains('quickview-container')) {
         doSlideUpdates({ slidesDOM, isNext, config, swiper });
-      } else {
-        doSlideUpdates({ slidesDOM, isNext, config, swiper });
+        setTimeout(() => {
+          slidesDOM.forEach(item => {
+            if (item.classList && item.classList.contains(config.className)) {
+              item.classList.remove(config.className);
+            }
+          });
+        }, config.duration + 100);
+        event.currentTarget.removeEventListener(event.type, cb);
       }
-      setTimeout(() => {
-        slidesDOM.forEach(item => {
-          if (item.classList && item.classList.contains(config.className)) {
-            item.classList.remove(config.className);
-          }
-        });
-      }, config.duration);
-    }, config.duration);
+    });
   }
 };
 
@@ -131,7 +138,7 @@ const adjustArrowOffset = swiper => {
 };
 
 const fixMobileSlides = swiper => {
-  if (window.innerWidth < 480) {
+  if (window.innerWidth < 510) {
     setTimeout(() => {
       swiper.$el[0].classList.add('margin-offset');
       swiper.slidesGrid = swiper.slidesGrid.map((slide, i) => {
@@ -147,7 +154,17 @@ const fixMobileSlides = swiper => {
       swiper.allowSlidePrev = true;
       const slides = Array.from(swiper.$el[0].children[0].children);
       slides.forEach(slide => (slide.style.width = `${parseInt(slide.style.width, 10) - 11}px`));
-    }, 200)
+    }, 200);
+  } else {
+    const isIE11 = !!window.MSInputMethodContext && !!document.documentMode;
+    if (isIE11) {
+      const slides = Array.from(swiper.$el[0].children[0].children);
+      slides.forEach(slide => {
+        const img = slide.querySelector('img');
+        img.style.width = slide.style.width;
+        console.log(img);
+      });
+    }
   }
 };
 
@@ -162,13 +179,20 @@ class Gallery extends React.Component {
     this.swiper = null;
     this.state = {
       swiper: null
-    }
+    };
+  }
+
+  componentWillMount() {
+    this.setState({ swiper: this.swiper });
   }
 
   componentDidMount() {
-    this.setState({ swiper: this.swiper });
-    fixMobileSlides(this.swiper)
-    adjustArrowOffset(this.swiper);
+    fixMobileSlides(this.swiper);
+    const _swiper = this.swiper;
+    this.swiper.slides[0].querySelector('img').addEventListener('load', function cb(event) {
+      setTimeout(() => adjustArrowOffset(_swiper), 100);
+      event.currentTarget.removeEventListener(event.type, cb);
+    });
     window.addEventListener('resize', () => adjustArrowOffset(this.swiper));
   }
 
@@ -184,7 +208,7 @@ class Gallery extends React.Component {
     };
     if (event.key === " " || event.key === "Enter") {
       event.preventDefault();
-      doAnimation(this.state.mySwiper, event, config);
+      doAnimation(this.state.swiper, event, config);
     }
   }
 
@@ -208,7 +232,7 @@ class Gallery extends React.Component {
           doAnimation(this, event, props);
         },
         resize() {
-          if (window.innerWidth < 480) {
+          if (window.innerWidth < 510) {
             this.slidesGrid = this.slidesGrid.map((slide, i) => {
               const newSlide = slide === -0 ? slide : slide - ((11 + 15) * i);
               return newSlide;
@@ -232,8 +256,8 @@ class Gallery extends React.Component {
       },
       spaceBetween: 10,
       breakpoints: {
-        // when window width is <= 480px
-        480: {
+        // when window width is <= 510px
+        510: {
           slidesPerView: 2,
           slidesPerGroup: 2,
           spaceBetween: 15,

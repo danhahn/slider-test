@@ -11,11 +11,17 @@ const S = styled.div`
 const Slide = ({i}) => {
   return <S>
       <div className="imageWrapper">
-        <img src={`https://picsum.photos/400/200?image=${i * 10}`} alt="" />
+        <div className="image-panel">
+          <img src={`https://picsum.photos/400/200?image=${i * 10}`} alt="" />
+          <button className="quickview-container">Quickview</button>
+        </div>
       </div>
-      <p>
-        {i} Lorem ipsum dolor sit
-      </p>
+      <ul>
+        <li>{i} Lorem ipsum dolor sit</li>
+        <li>{i} Lorem ipsum dolor sit</li>
+        <li>{i} Lorem ipsum dolor sit</li>
+        <li>{i} Lorem ipsum dolor sit</li>
+      </ul>
     </S>;
 };
 

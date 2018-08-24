@@ -7,16 +7,34 @@ import './App.css';
 // const data = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16];
 
 const StyledSwipe = styled.div`
-  /* border: 1px solid black; */
-  /* height: 300px; */
-  /* box-sizing: border-box;
-  display: flex; */
   &.fade {
-    .imageWrapper img {
-      opacity: 0;
+    transition: all 1s;
+    .image-panel {
+      img {
+        opacity: 0;
+        transition: all 1s;
+      }
+      .quickview-container {
+        opacity: 0;
+        transition: all 1s;
+      }
     }
-    p {
+    li {
       opacity: 0;
+      transition: all 1s;
+    }
+  }
+  &.fade&.fade-return {
+    .image-panel {
+      img {
+        opacity: 1;
+      }
+      .quickview-container {
+        opacity: 1;
+      }
+    }
+    li {
+      opacity: 1;
     }
   }
 `;
@@ -26,16 +44,20 @@ const Inner = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  .imageWrapper {
-    background-color: rebeccapurple;
+  .image-panel {
+    background-color: #f6f6f6;
   }
   img {
-    transition: all 1s;
+    transition: all 100ms;
     max-width: 100%;
   }
   p {
     transition: all 1s;
     margin: 1em;
+  }
+  li,
+  .quickview-container {
+    transition: all 100ms;
   }
 `;
 
@@ -45,10 +67,12 @@ const CustomButtonPrev = styled.button`
   width: 29px;
   height: 65px;
   left: 0;
+  top: 227px;
   margin-top: 0;
   transform: translateY(-50%);
+  background-size: 11px 35px;
   background-color: rgba(255, 255, 255, 0.7);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%0Axmlns:xlink='http://www.w3.org/1999/xlink' viewBox='0 0 23 70'%0Awidth='12px' height='35px'%3E%3Cpath fill-rule='evenodd' fill='#707070'%0Ad='M22.999,70.003 L2.379,35.000 L22.999,-0.002 L20.622,-0.002 L0.001,35.000 L20.622,70.003 L22.999,70.003 Z'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg viewBox='0 0 11 35' xmlns='http://www.w3.org/2000/svg' width='11' height='35'%3E%3Cpolygon class='cls-3' points='11 35 1.14 17.5 11 0 9.86 0 0 17.5 9.86 35' fill='%23707070'/%3E%3C/svg%3E%0A");
   transition: background-color 750ms;
   &.swiper-button-disabled {
     opacity: 0;
@@ -58,14 +82,19 @@ const CustomButtonPrev = styled.button`
   }
   &:hover,
   &:focus {
-    background-color: rgba(255, 255, 255, 0.9);
+    background-color: rgba(255, 255, 255, 1);
+    background-image: url("data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg viewBox='0 0 11 35' xmlns='http://www.w3.org/2000/svg' width='11' height='35'%3E%3Cpolygon class='cls-3' points='11 35 1.14 17.5 11 0 9.86 0 0 17.5 9.86 35' fill='%23000000'/%3E%3C/svg%3E%0A");
   }
 `;
 
 const CustomButtonNext = CustomButtonPrev.extend`
   left: inherit;
   right: 0;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%0Axmlns:xlink='http://www.w3.org/1999/xlink' viewBox='0 0 23 70'%0Awidth='12px' height='35px'%3E%3Cpath fill-rule='evenodd' fill='#707070'%0Ad='M0.001,-0.003 L20.621,35.000 L0.001,70.002 L2.378,70.002 L22.999,35.000 L2.378,-0.003 L0.001,-0.003 Z'/%3E%3C/svg%3E ");
+  background-image: url("data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg viewBox='0 0 11 35' width='11' height='35' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolygon class='cls-3' fill='%23707070' points='0 0 9.86 17.5 0 35 1.14 35 11 17.5 1.14 0'/%3E%3C/svg%3E%0A");
+  &:hover,
+  &:focus {
+    background-image: url("data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg viewBox='0 0 11 35' width='11' height='35' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolygon class='cls-3' fill='%23000000' points='0 0 9.86 17.5 0 35 1.14 35 11 17.5 1.14 0'/%3E%3C/svg%3E%0A");
+  }
 `;
 
 class Example extends React.Component {
