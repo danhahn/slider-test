@@ -99,7 +99,8 @@ const doAnimation = (swiper, event, props) => {
       ? event.toElement.classList
       : event.target.classList;
     const isNext = classListGroup.contains("swiper-button-next");
-    const slidesDOM = Array.from(Object.values(slides));
+    // const slidesDOM = Array.from(Object.values(slides));
+    const slidesDOM = [].slice.call(Object.values(slides));
     slidesDOM.forEach(item => {
       if (item.classList) {
         const image = item.querySelector('.image-panel img');
