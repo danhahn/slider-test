@@ -156,15 +156,15 @@ const fixMobileSlides = swiper => {
       slides.forEach(slide => (slide.style.width = `${parseInt(slide.style.width, 10) - 11}px`));
     }, 200);
   } else {
+    // check if ie 11 and add width to the image to ensure it displays correctly.
+    // with out this check the image size is not confined to the wrapper size.
     const isIE11 = !!window.MSInputMethodContext && !!document.documentMode;
     if (isIE11) {
-      // const slides = swiper.el.querySelectorAll('.swiper-slide');
+      // need to convert the nodeList to an array to loop over and set the size;
       const nodesArray = [].slice.call(swiper.el.querySelectorAll(".swiper-slide"));
-      console.log(nodesArray);
       nodesArray.forEach(function(slide) {
         const img = slide.querySelector('img');
         img.style.width = slide.style.width;
-        console.log(img);
       });
     }
   }
