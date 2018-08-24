@@ -1,6 +1,5 @@
 import React from 'react';
 import Swiper from 'react-id-swiper/lib/custom';
-import "core-js";
 import './gallery.css';
 
 const disabledRealIdCheck = ({ realIndex, max, hasTwoSlides }) => {
