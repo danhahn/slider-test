@@ -158,7 +158,8 @@ const fixMobileSlides = swiper => {
   } else {
     const isIE11 = !!window.MSInputMethodContext && !!document.documentMode;
     if (isIE11) {
-      const slides = Array.from(swiper.$el[0].children[0].children);
+      const slides = swiper.el.querySelectorAll('.swiper-slide')
+      console.log(slides);
       slides.forEach(slide => {
         const img = slide.querySelector('img');
         img.style.width = slide.style.width;
