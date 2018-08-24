@@ -85,6 +85,9 @@ const CustomButtonPrev = styled.button`
     background-color: rgba(255, 255, 255, 1);
     background-image: url("data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg viewBox='0 0 11 35' xmlns='http://www.w3.org/2000/svg' width='11' height='35'%3E%3Cpolygon class='cls-3' points='11 35 1.14 17.5 11 0 9.86 0 0 17.5 9.86 35' fill='%23000000'/%3E%3C/svg%3E%0A");
   }
+  &[disabled] {
+    display: none;
+  }
 `;
 
 const CustomButtonNext = CustomButtonPrev.extend`

@@ -75,6 +75,7 @@ const doSlideUpdates = ({ slidesDOM, isNext, config, swiper }) => {
 };
 
 const doAnimation = (swiper, event, props) => {
+  console.log({ swiper, event, props });
   const { className, duration } = props;
   const {
     realIndex,
@@ -131,11 +132,18 @@ const doAnimation = (swiper, event, props) => {
 };
 
 const adjustArrowOffset = swiper => {
+  const isIE11 = !!window.MSInputMethodContext && !!document.documentMode;
   const height = swiper.imagesToLoad[0].offsetHeight / 2;
   const next = swiper.navigation.nextEl;
-  next.style.top = `${height}px`;
   const prev = swiper.navigation.prevEl;
-  prev.style.top = `${height}px`;
+  if (!isIE11) {
+    next.style.top = `${height}px`;
+    prev.style.top = `${height}px`;
+  } else {
+    next.disabled = true;
+    prev.disabled = true;
+
+  }
 };
 
 const fixMobileSlides = swiper => {
