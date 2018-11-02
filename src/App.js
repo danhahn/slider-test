@@ -90,7 +90,7 @@ const CustomButtonPrev = styled.button`
   }
 `;
 
-const CustomButtonNext = CustomButtonPrev.extend`
+const CustomButtonNext = styled(CustomButtonPrev)`
   left: inherit;
   right: 0;
   background-image: url("data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg viewBox='0 0 11 35' width='11' height='35' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolygon class='cls-3' fill='%23707070' points='0 0 9.86 17.5 0 35 1.14 35 11 17.5 1.14 0'/%3E%3C/svg%3E%0A");

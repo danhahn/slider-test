@@ -2,46 +2,6 @@ import React from 'react';
 import Swiper from 'react-id-swiper/lib/custom';
 import './gallery.css';
 
-const disabledRealIdCheck = ({ realIndex, max, hasTwoSlides }) => {
-  // checks to see if has only two slides and returns `false` this is related
-  // to the way we have to check if the button is disabled
-  if (realIndex === 0 && hasTwoSlides) {
-    return false;
-  }
-  // return true if the realID is 0 but has more than two slides
-  if (realIndex === 0) {
-    // return true;
-  }
-
-  if (realIndex === max && !hasTwoSlides) {
-    return true;
-  }
-  return false;
-};
-
-const checkAnimateToNext = (event, isDisabled) => {
-  const next = 'swiper-button-next';
-  const prev = 'swiper-button-prev';
-  const disabled = "swiper-button-disabled";
-  const cl = event.toElement ? event.toElement.classList : event.target.classList;
-  if (!!cl.value) {
-    // check if `imageWrapper` if yes return 'false'
-    if (cl.contains("imageWrapper")) {
-      return false;
-    }
-    // check to see if `next` or `prev` class are in the classList if not return 'false'
-    if (cl.length && (!cl.contains(next) && !cl.contains(prev))) {
-      return false;
-    }
-    // check if button is disabled
-    if (cl.contains(disabled) && isDisabled) {
-      return false;
-    }
-    return true;
-  }
-  return false;
-};
-
 const doSlideUpdates = ({ slidesDOM, isNext, config, swiper }) => {
   const direction = isNext ? 'Next' : 'Prev';
   const {
@@ -81,54 +41,45 @@ const doAnimation = (swiper, event, props) => {
     realIndex,
     passedParams: { slidesPerGroup },
     slides,
-    slidesGrid
   } = swiper;
-  const isDisabled = disabledRealIdCheck({
-    realIndex,
-    max: slidesGrid.length - slidesPerGroup,
-    hasTwoSlides: slidesGrid.length <= slidesGrid.length * 2
-  });
-  const doAnimateToNext = checkAnimateToNext(event, isDisabled);
   const config = {
     realIndex,
     slidesPerGroup,
     className,
     duration
   };
-  if (doAnimateToNext) {
-    const classListGroup = event.toElement
-      ? event.toElement.classList
-      : event.target.classList;
-    const isNext = classListGroup.contains("swiper-button-next");
-    // const slidesDOM = Array.from(Object.values(slides));
-    const slidesDOM = [].slice.call(Object.values(slides));
-    slidesDOM.forEach(item => {
-      if (item.classList) {
-        const image = item.querySelector('.image-panel img');
-        const quickview = item.querySelector('.image-panel .quickview-container');
-        const lis = item.querySelectorAll('li');
-        const fadeElements = [image, quickview, ...lis];
-        fadeElements.forEach(element => {
-          element.style.transitionDuration = `${config.duration}ms`;
+  const classListGroup = event.toElement
+    ? event.toElement.classList
+    : event.target.classList;
+  const isNext = classListGroup.contains("swiper-button-next");
+  // const slidesDOM = Array.from(Object.values(slides));
+  const slidesDOM = [].slice.call(Object.values(slides));
+  slidesDOM.forEach(item => {
+    if (item.classList) {
+      const image = item.querySelector('.image-panel img');
+      const quickview = item.querySelector('.image-panel .quickview-container');
+      const lis = item.querySelectorAll('li');
+      const fadeElements = [image, quickview, ...lis];
+      fadeElements.forEach(element => {
+        element.style.transitionDuration = `${config.duration}ms`;
+      });
+      item.classList.add(config.className);
+    }
+  });
+  const [firstSlide] = slidesDOM;
+  firstSlide.addEventListener('transitionend', function cb(event) {
+    if (event.target.classList.contains('quickview-container')) {
+      doSlideUpdates({ slidesDOM, isNext, config, swiper });
+      setTimeout(() => {
+        slidesDOM.forEach(item => {
+          if (item.classList && item.classList.contains(config.className)) {
+            item.classList.remove(config.className);
+          }
         });
-        item.classList.add(config.className);
-      }
-    });
-    const [firstSlide] = slidesDOM;
-    firstSlide.addEventListener('transitionend', function cb(event) {
-      if (event.target.classList.contains('quickview-container')) {
-        doSlideUpdates({ slidesDOM, isNext, config, swiper });
-        setTimeout(() => {
-          slidesDOM.forEach(item => {
-            if (item.classList && item.classList.contains(config.className)) {
-              item.classList.remove(config.className);
-            }
-          });
-        }, config.duration + 100);
-        event.currentTarget.removeEventListener(event.type, cb);
-      }
-    });
-  }
+      }, config.duration + 100);
+      event.currentTarget.removeEventListener(event.type, cb);
+    }
+  });
 };
 
 const adjustArrowOffset = swiper => {
